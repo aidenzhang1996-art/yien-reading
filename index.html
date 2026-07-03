@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where Does Milk Come from? | 益恩课堂</title>
+  <style>
+    :root {
+      --primary-blue: #28AADC;
+      --accent-orange: #FAB43C;
+      --bg-light: #f5f7fa;
+      --card-bg: #ffffff;
+      --text-dark: #2c3e50;
+      --text-gray: #7f8c8d;
+      --radius: 12px;
+      --card-shadow: 0 4px 20px rgba(40, 170, 220, 0.12);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .site-header {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, #1a8fb8 100%);
+      color: white;
+      padding: 40px 20px 30px;
+      text-align: center;
+    }
+    .brand-tag { font-size: 0.85rem; opacity: 0.9; margin-bottom: 8px; letter-spacing: 1px; }
+    .site-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
+    .subtitle { font-size: 1.1rem; opacity: 0.85; }
+    main { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .audio-section { margin-bottom: 30px; }
+    .audio-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--card-shadow);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .audio-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary-blue), #1a8fb8);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .audio-icon svg { width: 24px; height: 24px; fill: white; }
+    .audio-info { flex: 1; min-width: 0; }
+    .audio-label { font-size: 0.85rem; color: var(--text-gray); margin-bottom: 2px; }
+    .audio-title { font-weight: 600; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audio-controls { display: flex; align-items: center; gap: 12px; }
+    .speed-btn {
+      background: var(--bg-light); border: 1px solid #e0e0e0;
+      border-radius: 20px; padding: 6px 12px;
+      font-size: 0.85rem; cursor: pointer; color: var(--text-dark);
+    }
+    .btn-play {
+      width: 44px; height: 44px;
+      background: var(--accent-orange); border: none; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    .btn-play:hover { transform: scale(1.05); }
+    .btn-play svg { width: 20px; height: 20px; fill: white; margin-left: 2px; }
+    .btn-play.playing svg { margin-left: 0; }
+    .progress-container { margin-top: 12px; padding: 0 4px; }
+    .progress-bar {
+      width: 100%; height: 6px; background: #e0e0e0;
+      border-radius: 3px; position: relative; cursor: pointer;
+    }
+    .progress-fill {
+      height: 100%; background: var(--primary-blue);
+      border-radius: 3px; width: 0%; position: relative;
+    }
+    .progress-handle {
+      position: absolute; right: -8px; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      background: var(--primary-blue); border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(40, 170, 220, 0.4);
+    }
+    .time-display { font-size: 0.8rem; color: var(--text-gray); margin-top: 8px; text-align: center; }
+    .story-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .story-text { flex: 1; min-width: 0; }
+    .story-text p { font-size: 1.05rem; line-height: 1.8; margin-bottom: 16px; }
+    .story-text p:last-child { margin-bottom: 0; }
+    .story-image { flex-shrink: 0; width: 45%; max-width: 280px; }
+    .story-image img { width: 100%; height: auto; border-radius: 8px; }
+    /* Vocabulary highlight in text */
+    .vw {
+      color: var(--primary-blue);
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px dashed var(--accent-orange);
+      transition: all 0.2s;
+      padding: 0 2px;
+    }
+    .vw:hover {
+      background: rgba(40, 170, 220, 0.1);
+      border-radius: 3px;
+    }
+    .vw.flash {
+      background: var(--accent-orange);
+      color: white;
+      border-radius: 3px;
+      border-bottom-color: transparent;
+    }
+    /* Translation Toggle */
+    .translation-toggle {
+      background: var(--bg-light); border: 1px solid #e8e8e8;
+      border-radius: 8px; padding: 10px 14px; margin-top: 12px;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      font-size: 0.85rem; color: var(--text-gray); transition: all 0.2s;
+    }
+    .translation-toggle:hover { background: #eef5f9; color: var(--primary-blue); }
+    .translation-toggle .arrow { transition: transform 0.3s; font-size: 0.75rem; }
+    .translation-toggle.expanded .arrow { transform: rotate(180deg); }
+    .translation-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .translation-content.expanded { max-height: 500px; }
+    .translation-text {
+      padding: 12px 14px; background: #fafbfc;
+      border-radius: 0 0 8px 8px; font-size: 0.95rem;
+      color: #555; line-height: 1.7;
+    }
+    .vocab-section {
+      background: var(--card-bg); border-radius: var(--radius);
+      box-shadow: var(--card-shadow); padding: 24px; margin-bottom: 20px;
+    }
+    .vocab-section h2 { font-size: 1.3rem; margin-bottom: 8px; color: var(--text-dark); }
+    .vocab-hint { font-size: 0.85rem; color: var(--text-gray); margin-bottom: 20px; }
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .vocab-item {
+      background: var(--bg-light); border: 1px solid #e8e8e8;
+      border-radius: 10px; padding: 14px; text-align: center;
+      cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .vocab-item:hover {
+      border-color: var(--primary-blue); background: #eef5f9;
+      transform: translateY(-2px);
+    }
+    .vocab-item.speaking {
+      background: var(--primary-blue); color: white;
+      border-color: var(--primary-blue);
+    }
+    .vocab-item.speaking .vocab-zh { color: rgba(255,255,255,0.9); }
+    .vocab-en {
+      font-size: 1.05rem; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-bottom: 4px;
+    }
+    .speak-icon { width: 16px; height: 16px; fill: var(--primary-blue); }
+    .vocab-item.speaking .speak-icon { fill: white; }
+    .vocab-zh { font-size: 0.85rem; color: var(--text-gray); }
+    .site-footer {
+      text-align: center; padding: 30px 20px;
+      color: var(--text-gray); font-size: 0.85rem;
+    }
+    .brand-name { color: var(--primary-blue); font-weight: 600; }
+    @media (max-width: 640px) {
+      .site-header { padding: 30px 16px 24px; }
+      .site-header h1 { font-size: 1.5rem; }
+      main { padding: 16px; }
+      .story-section { flex-direction: column; }
+      .story-image { width: 100%; max-width: none; order: -1; }
+      .audio-card { flex-wrap: wrap; }
+      .audio-info { width: 100%; }
+      .vocab-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand-tag">益恩课堂 · 每日阅读</div>
+  <h1>Where Does Milk Come from?</h1>
+  <div class="subtitle">牛奶从哪里来？</div>
+</header>
+
+<main>
+  <!-- Audio Player -->
+  <section class="audio-section">
+    <div class="audio-card">
+      <div class="audio-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+      </div>
+      <div class="audio-info">
+        <div class="audio-label">🎧 Listen & Follow</div>
+        <div class="audio-title">Track 01 · Where Does Milk Come from?</div>
+      </div>
+      <div class="audio-controls">
+        <button class="speed-btn" id="speedBtn">1.0x</button>
+        <button class="btn-play" id="playBtn">
+          <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill">
+          <div class="progress-handle" id="progressHandle"></div>
+        </div>
+      </div>
+      <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+    </div>
+    <audio id="readingAudio" preload="auto">
+      <source src="audio.mp3" type="audio/mpeg">
+    </audio>
+  </section>
+
+  <!-- Story Section 1 -->
+  <article class="story-section">
+    <div class="story-text">
+      <p>Billy is six years old. He visits his uncle and aunt every summer. They live on a <span class="vw" data-word="farm">farm</span>.</p>
+      <p>They have <span class="vw" data-word="cow">cows</span>, <span class="vw" data-word="chicken">chickens</span>, <span class="vw" data-word="sheep">sheep</span>, and a big <span class="vw" data-word="horse">horse</span> on the <span class="vw" data-word="farm">farm</span>. Billy loves all the animals.</p>
+      <p>This summer, he is going to learn how to <span class="vw" data-word="milk">milk</span> a <span class="vw" data-word="cow">cow</span>. Wow! His friends cannot <span class="vw" data-word="believe">believe</span> it.</p>
+      <div class="translation-toggle" data-target="trans1">
+        <span class="arrow">▼</span> 点击查看中文翻译
+      </div>
+      <div class="translation-content" id="trans1">
+        <div class="translation-text">
+          比利六岁了。每年夏天他都会去拜访他的叔叔和阿姨。他们住在一个农场里。<br>
+          农场里有奶牛、鸡、绵羊，还有一匹大马。比利喜欢所有的动物。<br>
+          今年夏天，他打算学习如何挤牛奶。哇！他的朋友们简直不敢相信。
+        </div>
+      </div>
+    </div>
+    <div class="story-image">
+      <img src="image1.png" alt="Billy and friends">
+    </div>
+  </article>
+
+  <!-- Story Section 2 -->
+  <article class="story-section">
+    <div class="story-text">
+      <p>"We get our <span class="vw" data-word="milk">milk</span> from the <span class="vw" data-word="store">store</span>," they say. "But our friend is going to get it from a <span class="vw" data-word="cow">cow</span>."</p>
+      <p>Billy laughs. "<span class="vw" data-word="milk">Milk</span> does not come from the <span class="vw" data-word="store">store</span>," he says. "<span class="vw" data-word="milk">Milk</span> comes from a <span class="vw" data-word="cow">cow</span>."</p>
+      <p>His friends do not <span class="vw" data-word="believe">believe</span> him. But his teacher says, "Yes, <span class="vw" data-word="milk">milk</span> comes from <span class="vw" data-word="cow">cows</span>. Cows eat <span class="vw" data-word="grass">grass</span>. They change the <span class="vw" data-word="grass">grass</span> into <span class="vw" data-word="milk">milk</span>. The <span class="vw" data-word="farmer">farmer</span> sells the <span class="vw" data-word="milk">milk</span>. And we buy it in the <span class="vw" data-word="store">stores</span>."</p>
+      <p>The teacher tells them one more thing. "Did you know that <span class="vw" data-word="cow">cows</span> have four <span class="vw" data-word="stomach">stomachs</span>?" The kids are <span class="vw" data-word="surprised">surprised</span>. But it's true!</p>
+      <div class="translation-toggle" data-target="trans2">
+        <span class="arrow">▼</span> 点击查看中文翻译
+      </div>
+      <div class="translation-content" id="trans2">
+        <div class="translation-text">
+          "我们的牛奶是从商店买的，"他们说。"但我们的朋友要从奶牛那里获取牛奶。"<br>
+          比利笑了。"牛奶不是从商店来的，"他说。"牛奶来自奶牛。"<br>
+          他的朋友们不相信他。但他的老师说："是的，牛奶来自奶牛。奶牛吃草，它们把草变成牛奶。农民把牛奶卖掉，我们在商店里买。"<br>
+          老师还告诉他们一件事："你们知道奶牛有四个胃吗？"孩子们都很惊讶。但这是真的！
+        </div>
+      </div>
+    </div>
+    <div class="story-image">
+      <img src="image2.png" alt="Cow eating grass">
+    </div>
+  </article>
+
+  <!-- Vocabulary Section -->
+  <section class="vocab-section">
+    <h2>📝 Key Vocabulary · 重点词汇</h2>
+    <p class="vocab-hint">💡 点击单词听发音</p>
+    <div class="vocab-grid">
+      <div class="vocab-item" data-word="farm"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>farm</div><span class="vocab-zh">农场</span></div>
+      <div class="vocab-item" data-word="cow"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>cow</div><span class="vocab-zh">奶牛</span></div>
+      <div class="vocab-item" data-word="milk"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>milk</div><span class="vocab-zh">牛奶</span></div>
+      <div class="vocab-item" data-word="chicken"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>chicken</div><span class="vocab-zh">鸡</span></div>
+      <div class="vocab-item" data-word="sheep"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>sheep</div><span class="vocab-zh">绵羊</span></div>
+      <div class="vocab-item" data-word="horse"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>horse</div><span class="vocab-zh">马</span></div>
+      <div class="vocab-item" data-word="grass"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>grass</div><span class="vocab-zh">草</span></div>
+      <div class="vocab-item" data-word="farmer"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>farmer</div><span class="vocab-zh">农民</span></div>
+      <div class="vocab-item" data-word="store"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>store</div><span class="vocab-zh">商店</span></div>
+      <div class="vocab-item" data-word="believe"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>believe</div><span class="vocab-zh">相信</span></div>
+      <div class="vocab-item" data-word="surprised"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>surprised</div><span class="vocab-zh">惊讶的</span></div>
+      <div class="vocab-item" data-word="stomach"><div class="vocab-en"><svg class="speak-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.49 4.49 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>stomach</div><span class="vocab-zh">胃</span></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  Made with 💙 by <span class="brand-name">益恩课堂</span> · English Daily Reading
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // ========== Audio Player ==========
+  var audio = document.getElementById('readingAudio');
+  var playBtn = document.getElementById('playBtn');
+  var playIcon = document.getElementById('playIcon');
+  var speedBtn = document.getElementById('speedBtn');
+  var progressBar = document.getElementById('progressBar');
+  var progressFill = document.getElementById('progressFill');
+  var progressHandle = document.getElementById('progressHandle');
+  var timeDisplay = document.getElementById('timeDisplay');
+  var speeds = [0.5, 0.75, 1.0, 1.25, 1.5];
+  var speedIdx = 2;
+  var isDragging = false;
+
+  function formatTime(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+  function updateProgress() {
+    if (!isDragging && audio.duration) {
+      var pct = (audio.currentTime / audio.duration) * 100;
+      progressFill.style.width = pct + '%';
+      timeDisplay.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
+    }
+  }
+  function seekTo(e) {
+    var rect = progressBar.getBoundingClientRect();
+    var x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    var pct = Math.max(0, Math.min(1, x / rect.width));
+    if (audio.duration) {
+      audio.currentTime = pct * audio.duration;
+      progressFill.style.width = (pct * 100) + '%';
+    }
+  }
+  playBtn.addEventListener('click', function() {
+    if (audio.paused) {
+      audio.play();
+      playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+      playBtn.classList.add('playing');
+    } else {
+      audio.pause();
+      playIcon.innerHTML = '<polygon points="5,3 19,12 5,21"/>';
+      playBtn.classList.remove('playing');
+    }
+  });
+  audio.addEventListener('ended', function() {
+    playIcon.innerHTML = '<polygon points="5,3 19,12 5,21"/>';
+    playBtn.classList.remove('playing');
+  });
+  audio.addEventListener('timeupdate', updateProgress);
+  audio.addEventListener('loadedmetadata', function() {
+    timeDisplay.textContent = '0:00 / ' + formatTime(audio.duration);
+  });
+  speedBtn.addEventListener('click', function() {
+    speedIdx = (speedIdx + 1) % speeds.length;
+    audio.playbackRate = speeds[speedIdx];
+    speedBtn.textContent = speeds[speedIdx] + 'x';
+  });
+  // Progress bar interactions
+  progressHandle.addEventListener('mousedown', function(e) { isDragging = true; e.preventDefault(); });
+  progressBar.addEventListener('mousedown', function(e) { isDragging = true; seekTo(e); });
+  document.addEventListener('mousemove', function(e) { if (isDragging) seekTo(e); });
+  document.addEventListener('mouseup', function() { isDragging = false; });
+  progressHandle.addEventListener('touchstart', function(e) { isDragging = true; }, { passive: true });
+  progressBar.addEventListener('touchstart', function(e) { isDragging = true; seekTo(e); }, { passive: true });
+  document.addEventListener('touchmove', function(e) { if (isDragging) seekTo(e); }, { passive: true });
+  document.addEventListener('touchend', function() { isDragging = false; });
+
+  // ========== Translation Toggle ==========
+  var toggles = document.querySelectorAll('.translation-toggle');
+  toggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var targetId = toggle.getAttribute('data-target');
+      var content = document.getElementById(targetId);
+      var isExpanded = content.classList.contains('expanded');
+      content.classList.toggle('expanded');
+      toggle.classList.toggle('expanded');
+      toggle.querySelector('.arrow').textContent = isExpanded ? '▼' : '▲';
+    });
+  });
+
+  // ========== Pronunciation (inline vocab + vocab cards) ==========
+  var pronPlayer = document.createElement('audio');
+  pronPlayer.style.display = 'none';
+  pronPlayer.preload = 'auto';
+  document.body.appendChild(pronPlayer);
+
+  function speakWord(word, el) {
+    // Visual feedback
+    var origClass = el.className;
+    el.classList.add('flash');
+    setTimeout(function() { el.classList.remove('flash'); }, 600);
+
+    var sources = [
+      'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(word) + '&type=2',
+      'https://fanyi.baidu.com/gettts?lan=en&text=' + encodeURIComponent(word) + '&spd=slow&source=web',
+      'https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=' + encodeURIComponent(word)
+    ];
+    var idx = 0;
+    function tryNext() {
+      if (idx >= sources.length) {
+        if ('speechSynthesis' in window) {
+          var u = new SpeechSynthesisUtterance(word);
+          u.lang = 'en-US';
+          u.rate = 0.8;
+          speechSynthesis.speak(u);
+        }
+        return;
+      }
+      pronPlayer.pause();
+      pronPlayer.src = sources[idx];
+      pronPlayer.load();
+      var timeout = setTimeout(function() { idx++; tryNext(); }, 3000);
+      pronPlayer.oncanplay = function() {
+        clearTimeout(timeout);
+        pronPlayer.play().catch(function() { clearTimeout(timeout); idx++; tryNext(); });
+      };
+      pronPlayer.onerror = function() { clearTimeout(timeout); idx++; tryNext(); };
+    }
+    tryNext();
+  }
+
+  // Inline vocabulary words in text
+  document.querySelectorAll('.vw').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      speakWord(el.getAttribute('data-word'), el);
+    });
+  });
+
+  // Vocabulary card items
+  document.querySelectorAll('.vocab-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      item.classList.add('speaking');
+      setTimeout(function() { item.classList.remove('speaking'); }, 800);
+      speakWord(item.getAttribute('data-word'), item);
+    });
+  });
+});
+</script>
+
+</body>
+</html>
